@@ -1,0 +1,64 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:padding="24dp">
+
+    <!-- Email -->
+    <EditText
+        android:id="@+id/registerEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:padding="12dp"/>
+    <!--android:background="@drawable/input_bg"-->
+
+    <!-- Password -->
+    <EditText
+        android:id="@+id/registerPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:padding="12dp"
+        android:layout_marginTop="8dp"/>
+    <!--android:background="@drawable/input_bg"-->
+
+    <!-- Confirm Password -->
+    <EditText
+        android:id="@+id/registerConfirmPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Confirm Password"
+        android:inputType="textPassword"
+        android:padding="12dp"
+        android:layout_marginTop="8dp"/>
+    <!--android:background="@drawable/input_bg"-->
+
+    <!-- Google Sign In -->
+    <Button
+        android:id="@+id/googleSignInBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sign in with Google"
+        android:backgroundTint="#FDA328"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="12dp"
+        android:layout_marginRight="70dp"
+        android:layout_marginLeft="70dp"/>
+
+    <!-- Register Button -->
+    <Button
+        android:id="@+id/registerBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="REGISTER"
+        android:backgroundTint="@color/primary"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="12dp"
+        android:layout_marginRight="70dp"
+        android:layout_marginLeft="70dp"/>
+
+</LinearLayout>

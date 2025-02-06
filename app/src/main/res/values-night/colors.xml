@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Mode Colors -->
+    <color name="primary">#3E4B47</color> <!-- Darker shade for primary -->
+    <color name="primary_variant">#3F5C4F</color>
+    <color name="secondary">#FF5722</color> <!-- Example contrast color -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#121212</color> <!-- Darker background color -->
+    <color name="gray">#B0B0B0</color>
+    <color name="bottomNavBackground">#333333</color> <!-- Dark background for bottom nav -->
+    <color name="bottomNavItemSelected">#00FF00</color> <!-- Light green for selected -->
+    <color name="bottomNavItemUnselected">#CCCCCC</color> <!-- Light gray for unselected -->
+    <color name="buttonColor">#FF9800</color> <!-- Example bright color -->
+    <color name="buttonTextColor">#FFFFFF</color>
+    <color name="mapRouteColor">#FF4500</color> <!-- Red route color -->
+    <color name="mapBackgroundColor">#333333</color> <!-- Dark background for the map -->
+    <color name="yellow">#FFEB3B</color>
+</resources>

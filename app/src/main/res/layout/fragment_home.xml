@@ -1,0 +1,115 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Top Design Section -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="#51786C">
+
+            <!-- Bubble Jeep Design -->
+
+            <!-- Jeep Image Placeholder -->
+
+            <TextView
+                android:layout_width="294dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="31dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="86dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="Welcome to Biyahe!"
+                android:textColor="#FFFFFF"
+                android:textSize="30sp" />
+
+            <TextView
+                android:layout_width="224dp"
+                android:layout_height="54dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="31dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginEnd="156dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="62dp"
+                android:text="Navigate swiftly, ride smart, arrive faster!"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:letterSpacing="0.06"/>
+
+            <View
+                android:id="@+id/bubble_shape"
+                android:layout_width="191dp"
+                android:layout_height="124dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginRight="-12dp"
+                android:layout_marginBottom="-6dp"
+                android:background="@drawable/jeep_bg" />
+
+            <ImageView
+                android:id="@+id/jeepImage"
+                android:layout_width="197dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginRight="-7dp"
+                android:layout_marginBottom="3dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/jeep" />
+        </RelativeLayout>
+
+        <!-- Search Bar (Navigates to Map Page) -->
+        <LinearLayout
+            android:id="@+id/searchBar"
+            android:layout_width="370dp"
+            android:layout_height="50dp"
+            android:background="@drawable/rounded_search_bar"
+            android:elevation="4dp"
+            android:orientation="horizontal"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:padding="12dp"
+            android:gravity="center_vertical"
+            android:layout_marginTop="-25dp"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_target"
+                android:layout_marginEnd="8dp"
+                app:tint="#FDA328" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Where are you headed?"
+                android:textColor="#888888"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <!-- Body Content -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Content Here!"
+            android:padding="16dp" />
+    </LinearLayout>
+</ScrollView>
