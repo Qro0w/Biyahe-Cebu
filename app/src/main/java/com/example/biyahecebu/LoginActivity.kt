@@ -3,6 +3,7 @@ package com.example.biyahecebu
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -108,8 +109,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun saveUserDataToFirestore(user: FirebaseUser) {
+        val userName = user.displayName ?: "New User"  // Use Google's display name, fallback to "New User"
         val userMap = hashMapOf(
-            "name" to "New User",  // Placeholder for user's name
+            "name" to userName,  // Use the display name from Google Sign-In
             "email" to user.email,
             "uid" to user.uid
         )
@@ -118,13 +120,14 @@ class LoginActivity : AppCompatActivity() {
             .set(userMap)
             .addOnSuccessListener {
                 // Successfully saved user data
-                Toast.makeText(this, "User Data Saved", Toast.LENGTH_SHORT).show()
+                Log.d("Firestore", "User data saved successfully.")
             }
             .addOnFailureListener {
                 // Failed to save user data
-                Toast.makeText(this, "Error Saving Data", Toast.LENGTH_SHORT).show()
+                Log.e("Firestore", "Error saving user data.")
             }
     }
+
 
     private fun setupGoogleSignIn() {
         val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

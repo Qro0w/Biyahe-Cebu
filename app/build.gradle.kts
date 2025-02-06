@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.volley)
+    implementation(libs.firebase.storage.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -65,6 +66,8 @@ dependencies {
     implementation ("com.google.android.gms:play-services-auth:20.7.0")
     implementation ("com.google.firebase:firebase-auth:22.0.0")
     implementation ("com.google.maps.android:android-maps-utils:2.2.3")
+    implementation ("com.github.bumptech.glide:glide:4.15.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.15.0")
 }
 
 //client ID 817631651424-ubjiro9915jg316pdiu2d78msv433vp7.apps.googleusercontent.com
