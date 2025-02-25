@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "817631651424",
+    "project_id": "biyahe--cebu",
+    "storage_bucket": "biyahe--cebu.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:817631651424:android:68c069844f73cc20504505",
+        "android_client_info": {
+          "package_name": "com.example.biyahecebu"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "817631651424-vmi4holjj5q3bbrihksjqcf9m6p3bc4q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmXGB4IZZPkDGmepCsrfrU6N2I_zFqreU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "817631651424-vmi4holjj5q3bbrihksjqcf9m6p3bc4q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

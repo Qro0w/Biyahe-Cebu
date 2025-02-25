@@ -49,7 +49,7 @@ class EditAccountDialogFragment : Fragment() {
         etFirstName = view.findViewById(R.id.etFirstName)
         etEmail = view.findViewById(R.id.etEmail)
         tvResetPasswordBtn = view.findViewById(R.id.tvResetPasswordBtn)
-        backButton = view.findViewById(R.id.backButton)
+        //backButton = view.findViewById(R.id.backButton) BACK BUTTON REMOVED
 
         // Load user data
         loadUserData()

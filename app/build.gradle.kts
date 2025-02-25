@@ -68,7 +68,8 @@ dependencies {
     implementation ("com.google.maps.android:android-maps-utils:2.2.3")
     implementation ("com.github.bumptech.glide:glide:4.15.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.0")
+    implementation ("com.android.volley:volley:1.2.1")
 }
 
 //client ID 817631651424-ubjiro9915jg316pdiu2d78msv433vp7.apps.googleusercontent.com
-// implementation ("")
+// implementation ("com.android.volley:volley:1.2.1")

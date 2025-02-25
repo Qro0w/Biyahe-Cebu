@@ -37,4 +37,17 @@
         app:layout_constraintTop_toBottomOf="@id/searchView"
         app:layout_constraintVertical_bias="0.0" />
 
+    <ImageView
+        android:id="@+id/favoriteFilterIcon"
+        android:layout_width="24dp"
+        android:layout_height="22dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_star_outline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#FFBC20" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

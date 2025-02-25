@@ -1,0 +1,27 @@
+<resources>
+    <!-- Primary Color used for the Bottom Navigation and other key elements -->
+    <color name="primary">#51786C</color> <!-- Change this to your preferred primary color -->
+    <color name="primary_variant">#3F5C4F</color>
+    <color name="secondary">#901F1F</color>
+    <!-- Secondary Color for contrast (used for text/icons) -->
+
+    <!-- Text and icon colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="gray">#808080</color>
+
+    <!-- Bottom Navigation specific colors -->
+    <color name="bottomNavBackground">#6200EE</color>
+    <color name="bottomNavItemSelected">#1CAE81</color>
+    <color name="bottomNavItemUnselected">#BDBDBD</color>
+
+    <!-- Other UI elements -->
+    <color name="buttonColor">#6200EE</color> <!-- Color for buttons -->
+    <color name="buttonTextColor">#FFFFFF</color> <!-- Text color for buttons -->
+
+    <!-- Map-related colors -->
+    <color name="mapRouteColor">#FF0000</color> <!-- Color for highlighting routes (Red, can change it) -->
+    <color name="mapBackgroundColor">#F0F0F0</color> <!-- Light gray background for the map -->
+
+    <color name="yellow">#FDA328</color>
+</resources>

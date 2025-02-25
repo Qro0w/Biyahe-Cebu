@@ -25,10 +25,7 @@
         android:textSize="18sp"
         android:textColor="@color/black"
         android:layout_marginStart="10dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
+        android:padding="4dp"
         android:background="@drawable/border_black"
         android:text="XX" />
 
@@ -50,5 +47,7 @@
         android:layout_height="30dp"
         android:src="@drawable/ic_star_outline"
         android:layout_marginStart="10dp"
-        app:tint="#FFBC20" />
+        app:tint="#FFBC20"
+        android:clickable="true"
+        android:focusable="true" />
 </LinearLayout>

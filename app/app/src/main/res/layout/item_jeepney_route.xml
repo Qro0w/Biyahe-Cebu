@@ -1,0 +1,54 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    android:background="@color/white"
+    android:gravity="center_vertical"
+    android:layout_marginBottom="4dp"
+    android:radius="40dp">
+
+    <!-- Jeepney Icon -->
+    <ImageView
+        android:id="@+id/jeepIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_jeepney"
+        app:tint="#1CAE81" />
+
+    <!-- Jeepney Code -->
+    <TextView
+        android:id="@+id/jeepCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:layout_marginStart="10dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:background="@drawable/border_black"
+        android:text="XX" />
+
+    <!-- Route Description -->
+    <TextView
+        android:id="@+id/routeDescription"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="16sp"
+        android:textColor="@color/gray"
+        android:layout_marginStart="10dp"
+        android:text="Route Details" />
+
+    <!-- Favorite Button -->
+    <ImageView
+        android:id="@+id/favoriteIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_star_outline"
+        android:layout_marginStart="10dp"
+        app:tint="#FFBC20" />
+</LinearLayout>

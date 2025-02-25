@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
@@ -33,16 +34,23 @@ class EditAccountFragment : BottomSheetDialogFragment() {
     private lateinit var etFirstName: EditText
     private lateinit var etEmail: EditText
     private lateinit var tvResetPasswordBtn: TextView
-    private lateinit var backButton: ImageView
+    //private lateinit var backButton: ImageView
 
     private val REQUEST_IMAGE_PICK = 1001
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.FullScreenBottomSheetDialog)
     }
 
-
+    private val imagePickerLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val imageUri: Uri? = result.data?.data
+                profileImageView.setImageURI(imageUri) // Update UI
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -73,20 +81,21 @@ class EditAccountFragment : BottomSheetDialogFragment() {
         etFirstName = view.findViewById(R.id.etFirstName)
         etEmail = view.findViewById(R.id.etEmail)
         tvResetPasswordBtn = view.findViewById(R.id.tvResetPasswordBtn)
-        backButton = view.findViewById(R.id.backButton)
+        //backButton = view.findViewById(R.id.backButton) BACK BUTTON REMOVED
 
         // Load user data
         loadUserData()
 
         // Back button logic
-        backButton.setOnClickListener {
+        /*backButton.setOnClickListener {
             parentFragmentManager.popBackStack()
-        }
+        }*/
 
         // Camera icon click (for updating profile image)
         editIcon.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            startActivityForResult(intent, REQUEST_IMAGE_PICK)
+            val pickImageIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            imagePickerLauncher.launch(pickImageIntent)
+
         }
 
         // Reset password button click (shows bottom sheet)

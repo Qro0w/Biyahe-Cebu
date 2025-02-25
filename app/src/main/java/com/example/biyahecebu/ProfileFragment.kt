@@ -166,7 +166,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                     emailTextView.text = email
 
                     if (user.photoUrl != null) {
-                        Glide.with(this).load(user.photoUrl).into(profileImageView)
+                        activity?.let { Glide.with(it).load(user.photoUrl).into(profileImageView) }
                     } else {
                         profileImageView.setImageResource(R.drawable.profile_placeholder)
                     }

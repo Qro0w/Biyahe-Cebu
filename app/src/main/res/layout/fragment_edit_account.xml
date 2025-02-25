@@ -21,7 +21,9 @@
             android:elevation="4dp"
             android:background="@drawable/sign_out_button">
 
-            <!-- Back Button -->
+            <!-- Back Button REMOVED -->
+            <!--
+
             <ImageView
                 android:id="@+id/backButton"
                 android:layout_width="24dp"
@@ -31,6 +33,8 @@
                 android:layout_marginStart="16dp"
                 android:src="@drawable/back"
                 android:contentDescription="Back" />
+
+                -->
         </RelativeLayout>
 
         <!-- Profile Section -->
