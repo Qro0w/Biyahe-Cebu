@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.volley)
     implementation(libs.firebase.storage.ktx)
+    implementation(libs.androidx.cardview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,6 +70,7 @@ dependencies {
     implementation ("com.github.bumptech.glide:glide:4.15.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.0")
     implementation ("com.android.volley:volley:1.2.1")
+    implementation ("androidx.cardview:cardview:1.0.0")
 }
 
 //client ID 817631651424-ubjiro9915jg316pdiu2d78msv433vp7.apps.googleusercontent.com

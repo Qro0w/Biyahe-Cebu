@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.Button
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -22,21 +24,24 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val searchBar = view.findViewById<View>(R.id.searchBar)
-        val howToBtn = view.findViewById<View>(R.id.howtobtn) // Find the "How to Use" button
+        val howToBtn = view.findViewById<View>(R.id.howtobtn)
+        val termsBtn = view.findViewById<View>(R.id.termsandconbtn) // Button to show Terms and Conditions
 
-        // Navigate to MapFragment when searchBar is clicked
         searchBar.setOnClickListener {
             requireActivity().supportFragmentManager.commit {
                 replace(R.id.nav_host_fragment, MapFragment())
-                addToBackStack(null) // Allows back navigation
+                addToBackStack(null)
             }
             val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)
             bottomNav.selectedItemId = R.id.map
         }
 
-        // Show pop-up when "How to Use" is clicked
         howToBtn.setOnClickListener {
             showHowToPopup()
+        }
+
+        termsBtn.setOnClickListener {
+            showTermsConditionsDialog()
         }
     }
 
@@ -44,11 +49,13 @@ class HomeFragment : Fragment() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.popup_howto)
-
-        // Close dialog when clicking outside
         dialog.setCancelable(true)
         dialog.setCanceledOnTouchOutside(true)
-
         dialog.show()
+    }
+
+    private fun showTermsConditionsDialog() {
+        val dialog = TermsConditionsDialog()
+        dialog.show(childFragmentManager, "TermsConditionsDialog")
     }
 }

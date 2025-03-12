@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.example.biyahecebu.models.JeepneyRoute
 
-class JeepneyRouteModal(private val route: JeepneyRoute) : DialogFragment() {
+class   JeepneyRouteModal(private val route: JeepneyRoute) : DialogFragment() {
 
     companion object {
         fun newInstance(route: JeepneyRoute): JeepneyRouteModal {
