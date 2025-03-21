@@ -16,7 +16,8 @@
         android:hint="Enter jeepney code or destination"
         android:padding="8dp"
         android:background="@android:color/white"
-        android:layout_margin="16dp" />
+        android:layout_margin="16dp"
+        android:completionThreshold="1"/>
 
     <!--<Button
         android:id="@+id/openBottomSheetButton"

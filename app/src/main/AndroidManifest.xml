@@ -41,10 +41,14 @@
         </activity>
 
         <activity
+            android:name=".OnboardingActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"/>
 
         <activity
             android:name=".MainActivity"

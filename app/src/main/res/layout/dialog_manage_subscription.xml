@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/card_background">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Manage Your Subscription"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/subscriptionStatusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your subscription is active until January 1, 2025"
+        android:textSize="16sp"
+        android:textColor="#1CAE81"
+        android:layout_marginBottom="24dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="What would you like to do?"
+        android:textSize="16sp"
+        android:textColor="#333333"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/renewSubscriptionButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Renew Subscription"
+        android:backgroundTint="#1CAE81"
+        android:layout_marginBottom="8dp" />
+
+    <Button
+        android:id="@+id/cancelSubscriptionButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cancel Subscription"
+        android:backgroundTint="#E74C3C"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="24dp" />
+
+    <Button
+        android:id="@+id/closeManageButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Close"
+        android:backgroundTint="#E0E0E0"
+        android:textColor="#333333" />
+</LinearLayout>

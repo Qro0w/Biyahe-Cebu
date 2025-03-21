@@ -25,7 +25,8 @@ class HomeFragment : Fragment() {
 
         val searchBar = view.findViewById<View>(R.id.searchBar)
         val howToBtn = view.findViewById<View>(R.id.howtobtn)
-        val termsBtn = view.findViewById<View>(R.id.termsandconbtn) // Button to show Terms and Conditions
+        val termsBtn = view.findViewById<View>(R.id.termsandconbtn)
+        val subscriptionBtn = view.findViewById<View>(R.id.subscriptionbtn) // Added subscription button
 
         searchBar.setOnClickListener {
             requireActivity().supportFragmentManager.commit {
@@ -43,6 +44,11 @@ class HomeFragment : Fragment() {
         termsBtn.setOnClickListener {
             showTermsConditionsDialog()
         }
+
+        // Add click listener for the subscription button
+        subscriptionBtn.setOnClickListener {
+            showSubscriptionPerksDialog()
+        }
     }
 
     private fun showHowToPopup() {
@@ -57,5 +63,30 @@ class HomeFragment : Fragment() {
     private fun showTermsConditionsDialog() {
         val dialog = TermsConditionsDialog()
         dialog.show(childFragmentManager, "TermsConditionsDialog")
+    }
+
+    // New method to show subscription perks dialog
+    private fun showSubscriptionPerksDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.popup_subscription_perks)
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+
+        // Find the subscription button inside the modal and set click listener
+        val subscribeButton = dialog.findViewById<Button>(R.id.btn_subscribe)
+        subscribeButton.setOnClickListener {
+            // Close the perks dialog
+            dialog.dismiss()
+
+            // Open the subscription dialog fragment with a callback function
+            val subscriptionDialog = SubscriptionDialogFragment { planId ->
+                // Handle the selected plan
+                // For example, you could show a toast message or navigate to payment screen
+            }
+            subscriptionDialog.show(childFragmentManager, "SubscriptionDialogFragment")
+        }
+
+        dialog.show()
     }
 }

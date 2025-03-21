@@ -83,6 +83,15 @@ class JeepneyRoutesFragment : Fragment() {
     }
 
     private fun setupSearchView() {
+        // Make search view expanded by default and clickable anywhere
+        searchView.setIconifiedByDefault(false)
+        searchView.isSubmitButtonEnabled = false
+
+        // Make search view clickable throughout
+        searchView.setOnClickListener {
+            searchView.isIconified = false
+        }
+
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false

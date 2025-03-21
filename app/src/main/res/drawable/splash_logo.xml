@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <bitmap
-            android:src="@drawable/biyahelogo"
+            android:src="@drawable/biyahelogotext"
             android:gravity="center"
             android:width="200dp"
             android:height="200dp" />

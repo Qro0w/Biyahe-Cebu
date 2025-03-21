@@ -18,30 +18,48 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal">
+            android:orientation="vertical">
 
-            <!-- Jeepney Code -->
-            <TextView
-                android:id="@+id/jeepneyCodeText"
-                android:layout_width="wrap_content"
+            <!-- Header with back button -->
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="26sp"
-                android:textStyle="bold"
-                android:textAlignment="center"
-                android:textColor="#1AAB7F"
-                android:paddingBottom="8dp"
-                android:minWidth="220dp" />
+                android:paddingHorizontal="16dp"
+                android:paddingTop="16dp">
+
+                <ImageButton
+                    android:id="@+id/backButton"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@android:drawable/ic_menu_close_clear_cancel"
+                    android:contentDescription="Back" />
+
+                <!-- Jeepney Code -->
+                <TextView
+                    android:id="@+id/jeepneyCodeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:textColor="#1AAB7F" />
+            </RelativeLayout>
 
             <!-- Route -->
             <TextView
                 android:id="@+id/routeDescriptionText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:textSize="18sp"
                 android:textAlignment="center"
                 android:textColor="#666666"
                 android:paddingBottom="16dp"
+                android:paddingHorizontal="16dp"
                 android:minWidth="220dp" />
 
             <!-- Landmarks Title -->
@@ -50,34 +68,31 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Landmarks"
+                android:layout_gravity="center_horizontal"
                 android:textAlignment="center"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#1AAB7F"
-                android:paddingTop="12dp"
                 android:paddingBottom="10dp" />
 
-            <!-- Landmarks List with Dark Background -->
-            <LinearLayout
+            <!-- Scrollable Landmarks Container -->
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/darker_gray"
-                android:padding="14dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="12dp"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:maxHeight="300dp"> <!-- Set max height to not take up too much screen -->
 
-                <TextView
-                    android:id="@+id/landmarksText"
+                <LinearLayout
+                    android:id="@+id/landmarksContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:textColor="@android:color/white"
-                    android:gravity="center"/>
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:background="#F5F5F5"
+                    android:padding="8dp"
+                    android:layout_marginBottom="12dp">
+                    <!-- Landmarks will be added here programmatically -->
+                </LinearLayout>
+            </ScrollView>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-
 </FrameLayout>

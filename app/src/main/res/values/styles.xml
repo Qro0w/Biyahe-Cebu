@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="BottomSheetDialogTheme" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-    </style>
     <style name="DialogTheme">
         <item name="android:backgroundDimAmount">0.7</item>
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -18,6 +13,17 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
+    </style>
+
+    <style name="CustomBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="behavior_peekHeight">600dp</item>
+        <item name="behavior_fitToContents">true</item>
+        <item name="behavior_skipCollapsed">true</item>
     </style>
 
 </resources>

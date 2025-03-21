@@ -4,30 +4,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#51786C"
+    android:padding="24dp"
     tools:context=".ProfileFragment">
 
-    <!-- LinearLayout as the root container for all content to make it scrollable -->
+    <!-- Single parent container -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="30dp"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp"
-        android:paddingBottom="24dp">
+        android:orientation="vertical">
 
-        <!-- Profile Info Card -->
+        <!-- Profile Card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginBottom="24dp"
-            android:padding="24dp"
+            android:layout_marginBottom="20dp"
+            android:padding="20dp"
             android:background="@drawable/card_background"
-            android:elevation="2dp"
+            android:elevation="4dp"
             android:gravity="center">
 
-            <!-- Profile Image at the Top -->
+            <!-- Progress Bar for loading -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <!-- Profile image -->
             <ImageView
                 android:id="@+id/profileImageView"
                 android:layout_width="120dp"
@@ -39,19 +44,19 @@
                 android:src="@drawable/profile_placeholder"
                 android:clipToOutline="true" />
 
-            <!-- Name of the User -->
+            <!-- Name -->
             <TextView
                 android:id="@+id/tvName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="New User"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 android:layout_gravity="center"
-                android:layout_marginBottom="8dp"
-                android:textColor="@android:color/black"/>
+                android:layout_marginBottom="4dp"
+                android:textColor="#333333"/>
 
-            <!-- Email of the User -->
+            <!-- Email -->
             <TextView
                 android:id="@+id/tvEmail"
                 android:layout_width="wrap_content"
@@ -60,112 +65,107 @@
                 android:textSize="16sp"
                 android:layout_gravity="center"
                 android:layout_marginBottom="20dp"
-                android:textColor="@android:color/black" />
+                android:textColor="#666666" />
 
             <!-- Edit Account Button -->
             <Button
                 android:id="@+id/btnEditAccount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Edit Account"
-                android:layout_marginRight="70dp"
-                android:layout_marginLeft="70dp"
+                android:text="Edit Profile"
+                android:layout_marginLeft="50dp"
+                android:layout_marginRight="50dp"
                 android:backgroundTint="#FDA328"
-                android:textColor="#FFFF"
+                android:textColor="#FFFFFF"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Subscription Info Card -->
+        <!-- Subscription Card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginBottom="24dp"
-            android:padding="24dp"
+            android:layout_marginBottom="20dp"
+            android:padding="20dp"
             android:background="@drawable/card_background"
-            android:elevation="2dp"
-            android:gravity="center">
+            android:elevation="4dp">
 
-            <!-- Subscription Prompt -->
+            <!-- Subscription text -->
             <TextView
                 android:id="@+id/subscriptionText"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Subscribe for a better experience!"
+                android:text="Unlock premium features!"
                 android:textSize="16sp"
+                android:textStyle="bold"
                 android:layout_gravity="center"
-                android:layout_marginBottom="16dp"
-                android:textColor="@android:color/black" />
+                android:layout_marginBottom="8dp"
+                android:textColor="#333333" />
+
+            <!-- Benefit description -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Get ad-free experience, offline maps, and premium support"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:layout_marginBottom="16dp"/>
 
             <!-- Subscribe Button -->
             <Button
                 android:id="@+id/subscribeButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Subscribe"
+                android:text="Subscribe Now"
                 android:backgroundTint="#1CAE81"
-                android:layout_marginBottom="16dp" />
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_marginBottom="8dp" />
 
-            <!-- Manage Subscription Button (Hidden for now) -->
+            <!-- Manage Subscription -->
             <Button
                 android:id="@+id/manageSubscriptionButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Manage Subscription"
-                android:visibility="gone"
-                android:layout_marginBottom="16dp" />
+                android:backgroundTint="#E0E0E0"
+                android:textColor="#333333"
+                android:visibility="gone" />
         </LinearLayout>
 
-        <!-- Sign Out Button Card -->
-
-        <!-- Progress Bar -->
-
+        <!-- Sign Out Button -->
         <LinearLayout
             android:id="@+id/signoutbtn"
-            android:layout_width="166dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="75dp"
-            android:layout_marginRight="170dp"
-            android:layout_marginBottom="24dp"
             android:background="@drawable/card_background"
             android:clickable="true"
-            android:elevation="2dp"
+            android:elevation="3dp"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
-            android:gravity="center_vertical"
+            android:gravity="center"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
             android:orientation="horizontal"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp">
+            android:layout_marginBottom="20dp">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="10dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="8dp"
                 android:src="@drawable/signout_icon" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="10dp"
                 android:text="Sign Out"
-                android:textColor="@android:color/black"
+                android:textColor="#E74C3C"
                 android:textSize="16sp" />
         </LinearLayout>
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_gravity="center" />
-
-        <FrameLayout
-            android:id="@+id/fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
     </LinearLayout>
-
 </ScrollView>

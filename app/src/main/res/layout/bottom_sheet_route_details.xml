@@ -1,74 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Jeepney Code Display -->
     <TextView
-        android:id="@+id/jeepCode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Jeepney Code"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_gravity="center"/>
-
-    <!-- Actual Route Name -->
-    <TextView
-        android:id="@+id/routeTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Route Name"
-        android:textSize="16sp"
-        android:layout_marginTop="4dp"
-        android:layout_gravity="center"/>
-
-    <!-- Scrollable Landmarks List -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nearby Landmarks:"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:layout_marginTop="8dp"/>
-
-    <ScrollView
+        android:id="@+id/routeTitleText"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:fillViewport="true">
+        android:layout_height="wrap_content"
+        android:text="Route Details"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
 
-        <ListView
-            android:id="@+id/landmarksListView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </ScrollView>
+    <TextView
+        android:id="@+id/routeDetailsText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
 
-    <!-- Toggle Landmarks Switch -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="12dp"
         android:gravity="center_vertical">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Show Landmarks"
-            android:textSize="14sp"
-            android:layout_marginEnd="8dp"/>
+            android:layout_weight="1"
+            android:text="Show landmarks" />
 
         <Switch
             android:id="@+id/toggleLandmarksSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Show Landmarks"
-            android:checked="true"
-            android:layout_gravity="center"/>
-
+            android:checked="true" />
     </LinearLayout>
 
 </LinearLayout>

@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -17,11 +16,13 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
@@ -30,9 +31,41 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private lateinit var nameTextView: TextView
     private lateinit var emailTextView: TextView
     private lateinit var profileImageView: ImageView
-    private lateinit var progressBar: ProgressBar // Optional: If you want to show loading state
+    private lateinit var progressBar: ProgressBar
     private lateinit var btnEditAccount: Button
     private lateinit var fragmentContainer: View
+    private lateinit var subscribeButton: Button
+    private lateinit var manageSubscriptionButton: Button
+    private lateinit var subscriptionText: TextView
+    private val BILLING_REQUEST_CODE = 1001
+    private var isGoogleUser = false
+
+    // Mock subscription states
+    private var isSubscribed = false
+    private var subscriptionEndDate: Date? = null
+
+    private fun showLoading() {
+        progressBar.visibility = View.VISIBLE
+        nameTextView.alpha = 0.5f
+        emailTextView.alpha = 0.5f
+        btnEditAccount.isEnabled = false
+    }
+
+    private fun hideLoading() {
+        progressBar.visibility = View.GONE
+        nameTextView.alpha = 1.0f
+        emailTextView.alpha = 1.0f
+        btnEditAccount.isEnabled = true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh user data when returning to this fragment
+        auth.currentUser?.let {
+            fetchUserData(it)
+            checkSubscriptionStatus(it.uid)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,18 +82,28 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         emailTextView = view.findViewById(R.id.tvEmail)
         profileImageView = view.findViewById(R.id.profileImageView)
         btnEditAccount = view.findViewById(R.id.btnEditAccount)
-        fragmentContainer = view.findViewById(R.id.fragment_container)
-        progressBar = view.findViewById(R.id.progressBar)
         val logoutBtn = view.findViewById<LinearLayout>(R.id.signoutbtn)
+        subscribeButton = view.findViewById(R.id.subscribeButton)
+        manageSubscriptionButton = view.findViewById(R.id.manageSubscriptionButton)
+        subscriptionText = view.findViewById(R.id.subscriptionText)
+        progressBar = view.findViewById(R.id.progressBar) // Make sure to add this to your layout
 
+        btnEditAccount.text = "Edit Profile"
+
+        // Check if user is signed in with Google
         val user = auth.currentUser
-        if (user == null) {
-            Toast.makeText(activity, "User is not authenticated", Toast.LENGTH_SHORT).show()
-            // Optionally, redirect to login screen or handle the error
-        }
         if (user != null) {
-            Log.d("User UID", user.uid)
+            // Check authentication providers
+            for (profile in user.providerData) {
+                if (profile.providerId == "google.com") {
+                    isGoogleUser = true
+                    Log.d("ProfileFragment", "User is authenticated with Google")
+                    break
+                }
+            }
+
             fetchUserData(user)  // Fetch and display user data
+            checkSubscriptionStatus(user.uid)  // Check subscription status
         } else {
             Toast.makeText(activity, "User not logged in", Toast.LENGTH_SHORT).show()
         }
@@ -69,130 +112,108 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             logoutUser()
         }
 
-        /*   ----------BOTTOM SHEET TEST-----------
-
-                // Set onClickListener for Edit Account button
-        btnEditAccount.setOnClickListener {
-            val bottomSheetFragment = BottomSheetEditAccountFragment()
-            bottomSheetFragment.show(requireActivity().supportFragmentManager, bottomSheetFragment.tag)
-        }
-
-        ------------------WITHIN PAGE SHEET TEST--------------
-
-
-        btnEditAccount.setOnClickListener {
-            // Navigate to the EditAccountFragment
-            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.fragment_container, EditAccountFragment())
-            transaction.addToBackStack(null)  // Optional: To allow back navigation
-            transaction.commit()
-        }*/
-
-
-
         btnEditAccount.setOnClickListener {
             val editAccountFragment = EditAccountFragment()
             editAccountFragment.show(parentFragmentManager, "editAccountFragment")
         }
 
+        // Set up subscription button click listeners
+        subscribeButton.setOnClickListener {
+            showSubscriptionDialog()
+        }
+
+        manageSubscriptionButton.setOnClickListener {
+            showManageSubscriptionDialog()
+        }
 
         return view
     }
 
-    private fun showEditAccountBottomSheet() {
-        val view = layoutInflater.inflate(R.layout.bottom_sheet_edit_account, null)
-        val dialog = BottomSheetDialog(requireContext(), R.style.BottomSheetDialogTheme)
-        dialog.setContentView(view)
-
-        val bottomSheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-        if (bottomSheet != null) {
-            val behavior = BottomSheetBehavior.from(bottomSheet)
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED // Make it fully expanded
-            behavior.peekHeight = resources.displayMetrics.heightPixels // Set height to full screen
-        }
-
-        // Add your button click listener for saving changes (e.g., updating profile info)
-        val saveBtn = view.findViewById<Button>(R.id.btnSaveAccountChanges)
-        saveBtn.setOnClickListener {
-            // Handle saving the new user data here (e.g., updating Firebase)
-            val newName = view.findViewById<EditText>(R.id.etAccountName).text.toString()
-            val newEmail = view.findViewById<EditText>(R.id.etAccountEmail).text.toString()
-
-            // Save the new name and email (e.g., to Firebase)
-            updateUserData(newName, newEmail)
-
-            dialog.dismiss() // Close the bottom sheet
-        }
-
-        dialog.show()
-    }
-
-    private fun updateUserData(name: String, email: String) {
-        val user = auth.currentUser
-        if (user != null) {
-            val userRef = firestore.collection("users").document(user.uid)
-            val updatedData: MutableMap<String, Any> = mutableMapOf(
-                "name" to name,
-                "email" to email
-            )
-
-            userRef.update(updatedData)
-                .addOnSuccessListener {
-                    // Successfully updated user data
-                    Toast.makeText(activity, "Account updated successfully", Toast.LENGTH_SHORT).show()
-                    // Optionally, refresh the UI to reflect updated data
-                    nameTextView.text = name
-                    emailTextView.text = email
-                }
-                .addOnFailureListener {
-                    // Failed to update user data
-                    Toast.makeText(activity, "Failed to update account", Toast.LENGTH_SHORT).show()
-                }
-        }
-    }
-
-
     private fun fetchUserData(user: FirebaseUser) {
+        showLoading()
+
         val docRef = firestore.collection("users").document(user.uid)
 
         docRef.get()
             .addOnSuccessListener { document ->
+
+                hideLoading()
+
                 if (document.exists()) {
                     // Document found, display the user data
                     val name = document.getString("name")
                     val email = document.getString("email")
+                    val photoUrl = document.getString("photoUrl")
 
                     nameTextView.text = name ?: "No Name"
                     emailTextView.text = email
 
-                    if (user.photoUrl != null) {
-                        activity?.let { Glide.with(it).load(user.photoUrl).into(profileImageView) }
-                    } else {
-                        profileImageView.setImageResource(R.drawable.profile_placeholder)
+                    // For Google users, always use their Google profile image
+                    if (isGoogleUser && user.photoUrl != null) {
+                        activity?.let {
+                            Glide.with(it)
+                                .load(user.photoUrl)
+                                .placeholder(R.drawable.profile_placeholder)
+                                .into(profileImageView)
+
+                            // Log for debugging
+                            Log.d("ProfileImage", "Loading Google profile image: ${user.photoUrl}")
+                        }
                     }
+                    // For regular users, use their custom image if available
+                    else if (!isGoogleUser && !photoUrl.isNullOrEmpty()) {
+                        activity?.let {
+                            Glide.with(it)
+                                .load(photoUrl)
+                                .placeholder(R.drawable.profile_placeholder)
+                                .into(profileImageView)
+
+                            // Log for debugging
+                            Log.d("ProfileImage", "Loading custom profile image: $photoUrl")
+                        }
+                    }
+                    // Use placeholder if no image is available
+                    else {
+                        profileImageView.setImageResource(R.drawable.profile_placeholder)
+                        Log.d("ProfileImage", "Using default placeholder")
+                    }
+
                 } else {
                     // No document found, create a new user document
                     createUserDocument(user)
                 }
             }
             .addOnFailureListener {
+                hideLoading()
+
                 Toast.makeText(activity, "Failed to fetch user data", Toast.LENGTH_SHORT).show()
             }
     }
 
     private fun createUserDocument(user: FirebaseUser) {
+        // Check if this is a Google user by provider ID
+        var isGoogle = false
+        for (profile in user.providerData) {
+            if (profile.providerId == "google.com") {
+                isGoogle = true
+                break
+            }
+        }
+
         val userMap = hashMapOf(
             "email" to user.email,
             "name" to user.displayName,
-            "uid" to user.uid
+            "uid" to user.uid,
+            "photoUrl" to (user.photoUrl?.toString() ?: ""),
+            "isGoogleUser" to isGoogle,  // Add flag to identify Google users
+            "isSubscribed" to false,     // Initialize subscription status
+            "subscriptionEndDate" to null
         )
 
         firestore.collection("users").document(user.uid)
             .set(userMap)
             .addOnSuccessListener {
-                // Successfully created the document
                 Toast.makeText(activity, "New user document created", Toast.LENGTH_SHORT).show()
-                // Optionally, refresh the UI here after creating the document
                 fetchUserData(user)  // Now fetch the user data again
             }
             .addOnFailureListener {
@@ -212,5 +233,162 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         requireActivity().finish() // Close ProfileFragment and prevent going back
+    }
+
+    // Subscription-related methods
+
+    private fun checkSubscriptionStatus(userId: String) {
+        showLoading()
+
+        val userRef = firestore.collection("users").document(userId)
+        userRef.get()
+            .addOnSuccessListener { document ->
+                hideLoading()
+
+                if (document.exists()) {
+                    isSubscribed = document.getBoolean("isSubscribed") ?: false
+
+                    // Get subscription end date if it exists
+                    val dateTimestamp = document.getTimestamp("subscriptionEndDate")
+                    subscriptionEndDate = dateTimestamp?.toDate()
+
+                    // Update UI based on subscription status
+                    updateSubscriptionUI()
+                }
+            }
+            .addOnFailureListener {
+                hideLoading()
+                Log.e("Subscription", "Failed to check subscription status", it)
+                Toast.makeText(activity, "Failed to check subscription status", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun updateSubscriptionUI() {
+        if (isSubscribed && subscriptionEndDate != null) {
+            // User is subscribed
+            val dateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault())
+            val formattedDate = dateFormat.format(subscriptionEndDate!!)
+
+            subscriptionText.text = "Premium Member\nExpires: $formattedDate"
+            subscribeButton.visibility = View.GONE
+            manageSubscriptionButton.visibility = View.VISIBLE
+        } else {
+            // User is not subscribed
+            subscriptionText.text = "Unlock premium features!"
+            subscribeButton.visibility = View.VISIBLE
+            manageSubscriptionButton.visibility = View.GONE
+        }
+    }
+
+    private fun showSubscriptionDialog() {
+        // Create a dialog for subscription options
+        val subscriptionDialog = SubscriptionDialogFragment { planId ->
+            // This is the callback that will be called when user selects a plan
+            processSubscription(planId)
+        }
+        subscriptionDialog.show(parentFragmentManager, "subscriptionDialog")
+    }
+
+    private fun showManageSubscriptionDialog() {
+        // Create a dialog for managing subscription
+        val manageDialog = ManageSubscriptionDialogFragment(
+            subscriptionEndDate,
+            { cancelSubscription() },  // Cancel callback
+            { renewSubscription() }    // Renew callback
+        )
+        manageDialog.show(parentFragmentManager, "manageSubscriptionDialog")
+    }
+
+    private fun processSubscription(planId: String) {
+        // Show loading
+        showLoading()
+
+        // In a real app, you would handle the billing process here
+        // For this mock, we'll simulate a successful subscription purchase
+
+        // Calculate subscription end date based on plan
+        val calendar = Calendar.getInstance()
+        when (planId) {
+            "monthly" -> calendar.add(Calendar.MONTH, 1)
+            "yearly" -> calendar.add(Calendar.YEAR, 1)
+            else -> calendar.add(Calendar.MONTH, 1) // Default to monthly
+        }
+
+        val newEndDate = calendar.time
+
+        // Update user document with subscription info
+        val userId = auth.currentUser?.uid ?: return
+
+        val updateData = hashMapOf(
+            "isSubscribed" to true,
+            "subscriptionEndDate" to newEndDate,
+            "subscriptionPlan" to planId,
+            "subscriptionStartDate" to Date()
+        )
+
+        firestore.collection("users").document(userId)
+            .update(updateData as Map<String, Any>)
+            .addOnSuccessListener {
+                hideLoading()
+                isSubscribed = true
+                subscriptionEndDate = newEndDate
+                updateSubscriptionUI()
+
+                // Show success message
+                Toast.makeText(activity, "Subscription successful!", Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener { e ->
+                hideLoading()
+                Log.e("Subscription", "Failed to update subscription", e)
+                Toast.makeText(activity, "Subscription failed: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    private fun cancelSubscription() {
+        showLoading()
+
+        val userId = auth.currentUser?.uid ?: return
+
+        val updateData = hashMapOf(
+            "isSubscribed" to false,
+            "subscriptionEndDate" to subscriptionEndDate  // Keep the end date for reference
+        )
+
+        firestore.collection("users").document(userId)
+            .update(updateData as Map<String, Any>)
+            .addOnSuccessListener {
+                hideLoading()
+
+                // Show confirmation but don't change UI until actual end date
+                Toast.makeText(
+                    activity,
+                    "Your subscription has been canceled but will remain active until the expiration date.",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                // Close the dialog
+                parentFragmentManager.findFragmentByTag("manageSubscriptionDialog")?.let {
+                    if (it is androidx.fragment.app.DialogFragment) {
+                        it.dismiss()
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                hideLoading()
+                Log.e("Subscription", "Failed to cancel subscription", e)
+                Toast.makeText(activity, "Failed to cancel subscription: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun renewSubscription() {
+        // Simply show the subscription options dialog again
+        showSubscriptionDialog()
+
+        // Close the manage dialog
+        parentFragmentManager.findFragmentByTag("manageSubscriptionDialog")?.let {
+            if (it is androidx.fragment.app.DialogFragment) {
+                it.dismiss()
+            }
+        }
     }
 }

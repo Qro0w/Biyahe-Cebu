@@ -1,7 +1,6 @@
 package com.example.biyahecebu
 
 import android.content.Intent
-import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -24,34 +23,32 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var binding: ActivityLoginBinding
     private lateinit var googleSignInClient: GoogleSignInClient
-    private lateinit var firestore: FirebaseFirestore  // Firestore instance
+    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         auth = FirebaseAuth.getInstance()
-        firestore = FirebaseFirestore.getInstance()  // Initialize Firestore
+        firestore = FirebaseFirestore.getInstance()
 
+        // Check if user is already logged in
         if (auth.currentUser != null) {
-            navigateToMainActivity()
+            navigateToMainActivity(false)
         }
 
-        val loginBtn = findViewById<Button>(R.id.loginBtn)
-        val googleSignInBtn = findViewById<LinearLayout>(R.id.googleSignInBtn)
-        val createAccountBtn = findViewById<Button>(R.id.createAccountBtn)
-
-        googleSignInBtn.setOnClickListener { googleSignIn() }
-        loginBtn.setOnClickListener { loginUser() }
-        createAccountBtn.setOnClickListener { showRegisterBottomSheet() }
+        // Set up click listeners
+        binding.loginBtn.setOnClickListener { loginUser() }
+        binding.googleSignInBtn.setOnClickListener { googleSignIn() }
+        binding.createAccountBtn.setOnClickListener { showRegistrationBottomSheet() }
 
         setupGoogleSignIn()
     }
 
     private fun loginUser() {
-        val email = findViewById<EditText>(R.id.emailInput).text.toString()
-        val password = findViewById<EditText>(R.id.passwordInput).text.toString()
+        val email = binding.emailInput.text.toString()
+        val password = binding.passwordInput.text.toString()
 
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
@@ -60,74 +57,105 @@ class LoginActivity : AppCompatActivity() {
 
         auth.signInWithEmailAndPassword(email, password)
             .addOnSuccessListener {
-                navigateToMainActivity()
+                // Check if user is new in Firestore
+                val user = auth.currentUser
+                if (user != null) {
+                    firestore.collection("users").document(user.uid)
+                        .get()
+                        .addOnSuccessListener { document ->
+                            Log.d("LoginActivity", "User ${user.uid} - Document exists: ${document.exists()}")
+                            if (document.exists()) {
+                                val onboardingCompleted = document.getBoolean("onboardingCompleted") ?: false
+                                Log.d("LoginActivity", "onboardingCompleted value: $onboardingCompleted")
+                                navigateToMainActivity(!onboardingCompleted)
+                            } else {
+                                navigateToMainActivity(true)
+                            }
+                        }
+                } else {
+                    navigateToMainActivity(false)
+                }
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun showRegisterBottomSheet() {
-        val view = layoutInflater.inflate(R.layout.bottom_sheet_register, null)
-        val dialog = BottomSheetDialog(this, R.style.BottomSheetDialogTheme)
-        dialog.setContentView(view)
+    private fun showRegistrationBottomSheet() {
+        val bottomSheetDialog = BottomSheetDialog(this, R.style.BottomSheetDialogTheme)
+        val bottomSheetView = layoutInflater.inflate(R.layout.bottom_sheet_register, null)
+        bottomSheetDialog.setContentView(bottomSheetView)
 
-        val bottomSheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+        // Make bottom sheet expanded by default
+        val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
         if (bottomSheet != null) {
             val behavior = BottomSheetBehavior.from(bottomSheet)
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED // Make it fully expanded
-            behavior.peekHeight = resources.displayMetrics.heightPixels // Set height to full screen
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            // Don't set the peekHeight to full screen as it can cause issues
+            // Instead, let it expand naturally
         }
 
-        val registerBtn = view.findViewById<Button>(R.id.registerBtn)
-        val googleSignInBtn = view.findViewById<Button>(R.id.googleSignInBtn)
+        // Set up registration button
+        val registerBtn = bottomSheetView.findViewById<Button>(R.id.registerBtn)
+        registerBtn.setOnClickListener {
+            registerUser(bottomSheetView, bottomSheetDialog)
+        }
 
-        registerBtn.setOnClickListener { registerUser(view, dialog) }
-        googleSignInBtn.setOnClickListener { googleSignIn() }
+        // Set up Google Sign In button in the bottom sheet
+        val googleSignInBtn = bottomSheetView.findViewById<Button>(R.id.googleSignUpBtn)
+        googleSignInBtn.setOnClickListener {
+            googleSignIn()
+            bottomSheetDialog.dismiss()
+        }
 
-        dialog.show()
+        bottomSheetDialog.show()
     }
-
 
     private fun registerUser(view: View, dialog: BottomSheetDialog) {
         val email = view.findViewById<EditText>(R.id.registerEmail).text.toString()
         val password = view.findViewById<EditText>(R.id.registerPassword).text.toString()
 
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Please fill all required fields", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         auth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener {
                 val user = auth.currentUser
                 if (user != null) {
-                    saveUserDataToFirestore(user)  // Save additional user data to Firestore
+                    saveUserDataToFirestore(user)
                 }
                 Toast.makeText(this, "Registered Successfully", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
-                navigateToMainActivity()
+                navigateToMainActivity(true) // true = new user, always show onboarding
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Registration Failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Registration Failed: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun saveUserDataToFirestore(user: FirebaseUser) {
-        val userName = user.displayName ?: "New User"  // Use Google's display name, fallback to "New User"
+    private fun saveUserDataToFirestore(user: FirebaseUser, isNewUser: Boolean = true) {
+        val userName = user.displayName ?: "New User"
+        val photoUrl = user.photoUrl?.toString() ?: ""
+
         val userMap = hashMapOf(
-            "name" to userName,  // Use the display name from Google Sign-In
+            "name" to userName,
             "email" to user.email,
-            "uid" to user.uid
+            "uid" to user.uid,
+            "photoUrl" to photoUrl,
+            "onboardingCompleted" to !isNewUser  // false for new users, true for existing
         )
 
-        firestore.collection("users").document(user.uid) // Using the user's UID as the document ID
+        firestore.collection("users").document(user.uid)
             .set(userMap)
             .addOnSuccessListener {
-                // Successfully saved user data
                 Log.d("Firestore", "User data saved successfully.")
             }
-            .addOnFailureListener {
-                // Failed to save user data
-                Log.e("Firestore", "Error saving user data.")
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error saving user data: ${e.message}")
             }
     }
-
 
     private fun setupGoogleSignIn() {
         val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -151,7 +179,7 @@ class LoginActivity : AppCompatActivity() {
                 val account = task.getResult(ApiException::class.java)!!
                 firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
-                Toast.makeText(this, "Google Sign-In Failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Google Sign-In Failed: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -161,17 +189,46 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    navigateToMainActivity() // Redirect after successful Google login
+                    val user = auth.currentUser
+                    if (user != null) {
+                        firestore.collection("users").document(user.uid)
+                            .get()
+                            .addOnSuccessListener { document ->
+                                if (document.exists()) {
+                                    // Check if onboarding is completed
+                                    val onboardingCompleted = document.getBoolean("onboardingCompleted") ?: false
+
+                                    if (onboardingCompleted) {
+                                        // User has completed onboarding
+                                        navigateToMainActivity(false)
+                                    } else {
+                                        // User exists but hasn't completed onboarding
+                                        navigateToMainActivity(true)
+                                    }
+                                } else {
+                                    // New user - create data
+                                    saveUserDataToFirestore(user, true)
+                                    navigateToMainActivity(true)
+                                }
+                            }
+                    }
                 } else {
                     Toast.makeText(this, "Authentication Failed", Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
-    private fun navigateToMainActivity() {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        finish() // Prevent going back to LoginActivity
+    private fun navigateToMainActivity(isNewUser: Boolean) {
+        if (isNewUser) {
+            // New user - show onboarding
+            val intent = Intent(this, OnboardingActivity::class.java)
+            startActivity(intent)
+        } else {
+            // Existing user - skip onboarding
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
+        finish()
     }
 }

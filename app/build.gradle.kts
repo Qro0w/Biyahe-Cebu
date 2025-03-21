@@ -57,10 +57,11 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation ("com.google.android.material:material:1.6.1")
+    implementation ("androidx.viewpager2:viewpager2:1.0.0")
+    implementation ("com.google.android.material:material:1.9.0")
     implementation ("com.google.firebase:firebase-bom:33.8.0") // Use the latest version
-    //implementation ("com.google.firebase:firebase-firestore-ktx") // For Firestore
-    //implementation ("com.google.firebase:firebase-auth-ktx") // For authentication (optional)
+    implementation ("com.google.firebase:firebase-firestore-ktx") // For Firestore
+    implementation ("com.google.firebase:firebase-auth-ktx") // For authentication (optional)
     implementation("androidx.navigation:navigation-fragment-ktx:2.8.6")
     implementation("androidx.navigation:navigation-ui-ktx:2.8.6")
     implementation ("com.google.android.gms:play-services-maps:19.0.0") // Use the latest version
@@ -71,7 +72,8 @@ dependencies {
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.0")
     implementation ("com.android.volley:volley:1.2.1")
     implementation ("androidx.cardview:cardview:1.0.0")
+    implementation ("com.google.android.libraries.places:places:3.4.0")
 }
 
 //client ID 817631651424-ubjiro9915jg316pdiu2d78msv433vp7.apps.googleusercontent.com
-// implementation ("com.android.volley:volley:1.2.1")
+// implementation ('androidx.constraintlayout:constraintlayout:2.1.4')

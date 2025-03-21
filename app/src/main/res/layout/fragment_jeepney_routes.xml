@@ -8,19 +8,39 @@
     android:padding="16dp"
     tools:context=".JeepneyRoutesFragment">
 
-    <!-- Search View -->
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/searchView"
+    <!-- Search View in parent container -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/searchContainer"
         android:layout_width="0dp"
-        android:layout_margin="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/rounded_search_bar"
-        android:queryHint="Search for Jeepney Code"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_search_bar"
+            android:queryHint="Search for Jeepney Code"
+            app:layout_constraintEnd_toStartOf="@+id/favoriteFilterIcon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:iconifiedByDefault="false" />
+
+        <ImageView
+            android:id="@+id/favoriteFilterIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
+            android:src="@drawable/ic_star_outline"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:tint="#FFBC20" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- RecyclerView for listing Jeepney Routes -->
     <androidx.recyclerview.widget.RecyclerView
@@ -34,20 +54,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchView"
+        app:layout_constraintTop_toBottomOf="@id/searchContainer"
         app:layout_constraintVertical_bias="0.0" />
-
-    <ImageView
-        android:id="@+id/favoriteFilterIcon"
-        android:layout_width="24dp"
-        android:layout_height="22dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/ic_star_outline"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="#FFBC20" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
