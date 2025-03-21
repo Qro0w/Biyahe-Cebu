@@ -100,10 +100,21 @@ class OnboardingActivity : AppCompatActivity() {
         val indicatorCount = adapter.itemCount
         indicators = Array(indicatorCount) { View(this) }
 
-        // Create indicator views
+        // Calculate dimensions in DP for consistency
+        val indicatorSizeInDp = 12 // Larger size (was 16px, which is small on high-res screens)
+        val indicatorMarginInDp = 12 // Add margin between indicators
+
+        val indicatorSizeInPx = (indicatorSizeInDp * resources.displayMetrics.density).toInt()
+        val indicatorMarginInPx = (indicatorMarginInDp * resources.displayMetrics.density).toInt()
+
+        // Create indicator views with margins
         for (i in 0 until indicatorCount) {
             indicators[i] = View(this).apply {
-                layoutParams = ViewGroup.LayoutParams(16, 16)
+                // Create layout params with margins
+                val params = ViewGroup.MarginLayoutParams(indicatorSizeInPx, indicatorSizeInPx)
+                params.setMargins(indicatorMarginInPx, 0, indicatorMarginInPx, 0)
+                layoutParams = params
+
                 background = ContextCompat.getDrawable(context, R.drawable.indicator_inactive)
             }
             indicatorContainer.addView(indicators[i])

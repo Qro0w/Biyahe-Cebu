@@ -25,7 +25,7 @@
             android:id="@+id/monthlyPlanRadio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Monthly Plan - $4.99/month"
+            android:text="Monthly Plan - ₱199/month"
             android:checked="true"
             android:paddingVertical="8dp"
             android:textSize="16sp" />
@@ -34,7 +34,7 @@
             android:id="@+id/yearlyPlanRadio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Yearly Plan - $49.99/year (Save 17%)"
+            android:text="Yearly Plan - ₱1,999/year (Save 17%!)"
             android:paddingVertical="8dp"
             android:textSize="16sp" />
     </RadioGroup>

@@ -32,7 +32,7 @@ class OnboardingPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(
         fragments.add(
             OnboardingFragment.newInstance(
                 "Your Guide to Public Transport",
-                "A hassle-free way to commute. Access route details anytime, anywhere—no need to memorize numbers or ask around. Travel smarter with Skyone Cebu!",
+                "A hassle-free way to commute. Access route details anytime, anywhere—no need to memorize numbers or ask around. Travel smarter with Biyahe! Cebu",
                 R.drawable.img_onboarding_3,
                 2
             )

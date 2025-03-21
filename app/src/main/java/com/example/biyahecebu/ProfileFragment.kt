@@ -3,6 +3,9 @@ package com.example.biyahecebu
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,9 +16,12 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -37,6 +43,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private lateinit var subscribeButton: Button
     private lateinit var manageSubscriptionButton: Button
     private lateinit var subscriptionText: TextView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private val BILLING_REQUEST_CODE = 1001
     private var isGoogleUser = false
 
@@ -56,14 +63,22 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         nameTextView.alpha = 1.0f
         emailTextView.alpha = 1.0f
         btnEditAccount.isEnabled = true
+        if (swipeRefreshLayout.isRefreshing) {
+            swipeRefreshLayout.isRefreshing = false
+        }
     }
 
     override fun onResume() {
         super.onResume()
         // Refresh user data when returning to this fragment
         auth.currentUser?.let {
-            fetchUserData(it)
-            checkSubscriptionStatus(it.uid)
+            if (isNetworkAvailable()) {
+                fetchUserData(it)
+                checkSubscriptionStatus(it.uid)
+            } else {
+                hideLoading()
+                showNoNetworkError()
+            }
         }
     }
 
@@ -86,7 +101,13 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         subscribeButton = view.findViewById(R.id.subscribeButton)
         manageSubscriptionButton = view.findViewById(R.id.manageSubscriptionButton)
         subscriptionText = view.findViewById(R.id.subscriptionText)
-        progressBar = view.findViewById(R.id.progressBar) // Make sure to add this to your layout
+        progressBar = view.findViewById(R.id.progressBar)
+
+        // Setup SwipeRefreshLayout
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
+        swipeRefreshLayout.setOnRefreshListener {
+            refreshProfile()
+        }
 
         btnEditAccount.text = "Edit Profile"
 
@@ -102,8 +123,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 }
             }
 
-            fetchUserData(user)  // Fetch and display user data
-            checkSubscriptionStatus(user.uid)  // Check subscription status
+            if (isNetworkAvailable()) {
+                fetchUserData(user)  // Fetch and display user data
+                checkSubscriptionStatus(user.uid)  // Check subscription status
+            } else {
+                showNoNetworkError()
+            }
         } else {
             Toast.makeText(activity, "User not logged in", Toast.LENGTH_SHORT).show()
         }
@@ -129,6 +154,60 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         return view
     }
 
+    private fun refreshProfile() {
+        if (isNetworkAvailable()) {
+            // Show refreshing indicator
+            swipeRefreshLayout.isRefreshing = true
+
+            // Get current user
+            val user = auth.currentUser
+            if (user != null) {
+                fetchUserData(user)
+                checkSubscriptionStatus(user.uid)
+            } else {
+                swipeRefreshLayout.isRefreshing = false
+                Toast.makeText(activity, "User not logged in", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            // Stop refreshing and show error
+            swipeRefreshLayout.isRefreshing = false
+            showNoNetworkError()
+        }
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = context?.getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connectivityManager.activeNetwork ?: return false
+            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+            return when {
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                else -> false
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            val networkInfo = connectivityManager.activeNetworkInfo
+            @Suppress("DEPRECATION")
+            return networkInfo != null && networkInfo.isConnected
+        }
+    }
+
+    private fun showNoNetworkError() {
+        val snackbar = Snackbar.make(
+            swipeRefreshLayout,
+            "No internet connection. Please check your network.",
+            Snackbar.LENGTH_LONG
+        )
+        snackbar.setAction("Retry") {
+            refreshProfile()
+        }
+        snackbar.show()
+    }
+
     private fun fetchUserData(user: FirebaseUser) {
         showLoading()
 
@@ -136,7 +215,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
         docRef.get()
             .addOnSuccessListener { document ->
-
                 hideLoading()
 
                 if (document.exists()) {
@@ -185,12 +263,20 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             }
             .addOnFailureListener {
                 hideLoading()
-
-                Toast.makeText(activity, "Failed to fetch user data", Toast.LENGTH_SHORT).show()
+                if (isNetworkAvailable()) {
+                    Toast.makeText(activity, "Failed to fetch user data", Toast.LENGTH_SHORT).show()
+                } else {
+                    showNoNetworkError()
+                }
             }
     }
 
     private fun createUserDocument(user: FirebaseUser) {
+        if (!isNetworkAvailable()) {
+            showNoNetworkError()
+            return
+        }
+
         // Check if this is a Google user by provider ID
         var isGoogle = false
         for (profile in user.providerData) {
@@ -217,7 +303,11 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 fetchUserData(user)  // Now fetch the user data again
             }
             .addOnFailureListener {
-                Toast.makeText(activity, "Failed to create user document", Toast.LENGTH_SHORT).show()
+                if (isNetworkAvailable()) {
+                    Toast.makeText(activity, "Failed to create user document", Toast.LENGTH_SHORT).show()
+                } else {
+                    showNoNetworkError()
+                }
             }
     }
 
@@ -238,6 +328,11 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     // Subscription-related methods
 
     private fun checkSubscriptionStatus(userId: String) {
+        if (!isNetworkAvailable()) {
+            showNoNetworkError()
+            return
+        }
+
         showLoading()
 
         val userRef = firestore.collection("users").document(userId)
@@ -258,8 +353,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             }
             .addOnFailureListener {
                 hideLoading()
-                Log.e("Subscription", "Failed to check subscription status", it)
-                Toast.makeText(activity, "Failed to check subscription status", Toast.LENGTH_SHORT).show()
+                if (isNetworkAvailable()) {
+                    Log.e("Subscription", "Failed to check subscription status", it)
+                    Toast.makeText(activity, "Failed to check subscription status", Toast.LENGTH_SHORT).show()
+                } else {
+                    showNoNetworkError()
+                }
             }
     }
 
@@ -281,6 +380,11 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     }
 
     private fun showSubscriptionDialog() {
+        if (!isNetworkAvailable()) {
+            showNoNetworkError()
+            return
+        }
+
         // Create a dialog for subscription options
         val subscriptionDialog = SubscriptionDialogFragment { planId ->
             // This is the callback that will be called when user selects a plan
@@ -290,6 +394,11 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     }
 
     private fun showManageSubscriptionDialog() {
+        if (!isNetworkAvailable()) {
+            showNoNetworkError()
+            return
+        }
+
         // Create a dialog for managing subscription
         val manageDialog = ManageSubscriptionDialogFragment(
             subscriptionEndDate,
@@ -300,6 +409,11 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     }
 
     private fun processSubscription(planId: String) {
+        if (!isNetworkAvailable()) {
+            showNoNetworkError()
+            return
+        }
+
         // Show loading
         showLoading()
 
@@ -339,12 +453,21 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             }
             .addOnFailureListener { e ->
                 hideLoading()
-                Log.e("Subscription", "Failed to update subscription", e)
-                Toast.makeText(activity, "Subscription failed: ${e.message}", Toast.LENGTH_LONG).show()
+                if (isNetworkAvailable()) {
+                    Log.e("Subscription", "Failed to update subscription", e)
+                    Toast.makeText(activity, "Subscription failed: ${e.message}", Toast.LENGTH_LONG).show()
+                } else {
+                    showNoNetworkError()
+                }
             }
     }
 
     private fun cancelSubscription() {
+        if (!isNetworkAvailable()) {
+            showNoNetworkError()
+            return
+        }
+
         showLoading()
 
         val userId = auth.currentUser?.uid ?: return
@@ -375,8 +498,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             }
             .addOnFailureListener { e ->
                 hideLoading()
-                Log.e("Subscription", "Failed to cancel subscription", e)
-                Toast.makeText(activity, "Failed to cancel subscription: ${e.message}", Toast.LENGTH_SHORT).show()
+                if (isNetworkAvailable()) {
+                    Log.e("Subscription", "Failed to cancel subscription", e)
+                    Toast.makeText(activity, "Failed to cancel subscription: ${e.message}", Toast.LENGTH_SHORT).show()
+                } else {
+                    showNoNetworkError()
+                }
             }
     }
 

@@ -3,6 +3,7 @@
     <item>
         <bitmap
             android:src="@drawable/loginscreen"
-            android:gravity="fill" />
+            android:gravity="center"
+            android:tileMode="disabled" />
     </item>
 </layer-list>
