@@ -68,6 +68,23 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Check if we should open the subscription dialog
+        arguments?.let {
+            if (it.getBoolean("openSubscriptionDialog", false)) {
+                // Remove the argument to prevent reopening on fragment recreation
+                it.remove("openSubscriptionDialog")
+
+                // Wait for the fragment to be fully created before showing dialog
+                view.post {
+                    showSubscriptionDialog()
+                }
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         // Refresh user data when returning to this fragment

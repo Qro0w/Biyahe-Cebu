@@ -49,8 +49,11 @@ class TermsConditionsDialog : DialogFragment() {
     override fun onStart() {
         super.onStart()
         dialog?.window?.apply {
-            setLayout((resources.displayMetrics.widthPixels * 0.85).toInt(), ViewGroup.LayoutParams.WRAP_CONTENT)
-            setBackgroundDrawable(ColorDrawable(Color.WHITE))
+            setLayout(
+                (resources.displayMetrics.widthPixels * 0.85).toInt(),
+                (resources.displayMetrics.heightPixels * 0.85).toInt()
+            )
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         }
     }
 

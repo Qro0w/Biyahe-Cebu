@@ -79,12 +79,22 @@ class HomeFragment : Fragment() {
             // Close the perks dialog
             dialog.dismiss()
 
-            // Open the subscription dialog fragment with a callback function
-            val subscriptionDialog = SubscriptionDialogFragment { planId ->
-                // Handle the selected plan
-                // For example, you could show a toast message or navigate to payment screen
+            // Navigate to Profile Fragment
+            val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottomNav)
+            bottomNav.selectedItemId = R.id.profile
+
+            // Add an argument to indicate we should open the subscription dialog
+            val bundle = Bundle()
+            bundle.putBoolean("openSubscriptionDialog", true)
+
+            // Get the ProfileFragment and set arguments
+            val profileFragment = ProfileFragment()
+            profileFragment.arguments = bundle
+
+            // Navigate to the ProfileFragment
+            requireActivity().supportFragmentManager.commit {
+                replace(R.id.nav_host_fragment, profileFragment)
             }
-            subscriptionDialog.show(childFragmentManager, "SubscriptionDialogFragment")
         }
 
         dialog.show()

@@ -43,7 +43,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             app:endIconMode="password_toggle"
-
             app:startIconTint="#1CAE81">
 
             <com.google.android.material.textfield.TextInputEditText

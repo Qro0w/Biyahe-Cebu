@@ -42,7 +42,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Premium features include:\n• Ad-free experience\n• Offline maps\n• Priority customer support\n• Route planning\n• Real-time traffic updates"
+        android:text="Premium features include:\n• Remove advertisements\n• New intuitive route planner\n• Offline map functionality\n• AI-powered route guides\n• Real-time traffic updates"
         android:textSize="14sp"
         android:textColor="#666666"
         android:layout_marginTop="16dp"

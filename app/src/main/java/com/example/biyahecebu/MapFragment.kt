@@ -63,6 +63,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var endMarker: Marker? = null
     private val landmarkMarkers = mutableListOf<Marker>()
     private var landmarksVisible = true
+    private val routePolylines = mutableListOf<Polyline>()
+    private val routeMarkers = mutableListOf<Marker>()
     private val apiKey = "AIzaSyAmXGB4IZZPkDGmepCsrfrU6N2I_zFqreU"
 
     private var startLocation: LatLng? = null
@@ -166,6 +168,51 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
             .show()
+    }
+
+    private fun showJeepneyRoute(jeepneyCode: String) {
+        // Clear any existing routes
+        clearRoute()
+
+        // Convert to uppercase for matching
+        val normalizedCode = jeepneyCode.uppercase()
+
+        // Find the matching route
+        jeepneyRoutes.entries.find { (code, _) ->
+            code.equals(normalizedCode, ignoreCase = true)
+        }?.let { (code, coordinates) ->
+            // Add a polyline for the route
+            if (coordinates.size >= 2) {
+                val polylineOptions = PolylineOptions()
+                    .addAll(coordinates.map { it.second })
+                    .color(Color.BLUE)
+                    .width(10f)
+
+                val polyline = googleMap.addPolyline(polylineOptions)
+                routePolylines.add(polyline)
+
+                // Add landmark markers for the route
+                addLandmarkMarkers(coordinates)
+
+                // Move camera to show the entire route
+                val builder = LatLngBounds.Builder()
+                coordinates.forEach { builder.include(it.second) }
+
+                try {
+                    val bounds = builder.build()
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+
+                    // Show a toast indicating the route is displayed
+                    Toast.makeText(requireContext(), "Showing route for jeepney $code", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Log.e("MapFragment", "Error moving camera: ", e)
+                }
+            } else {
+                Toast.makeText(requireContext(), "Route data incomplete for jeepney $code", Toast.LENGTH_SHORT).show()
+            }
+        } ?: run {
+            Toast.makeText(requireContext(), "Jeepney code '$jeepneyCode' not found", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun fetchJeepneyCodes() {
@@ -312,7 +359,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         destinationSearchBar.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
+            override fun afterTextChanged(s: Editable?) {
+                // Check if text matches a jeepney code pattern (e.g., 01K, 01C)
+                val text = s.toString().trim()
+                if (text.matches(Regex("^\\d{2}[a-zA-Z]$"))) {
+                    // This looks like a jeepney code, display the route
+                    showJeepneyRoute(text)
+                }
+            }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s != null && s.length >= 2) {
@@ -362,11 +416,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun findRouteIfReady() {
+
+        val destinationText = destinationSearchBar.text.toString().trim()
+        if (destinationText.matches(Regex("^\\d{2}[a-zA-Z]$"))) {
+            showJeepneyRoute(destinationText)
+            return
+        }
         // Make sure we have destination
         if (destinationLocation == null) {
             Toast.makeText(requireContext(), "Please select a destination", Toast.LENGTH_SHORT).show()
             return
         }
+
 
         // Get current location if using current location
         if (useCurrentLocation) {
@@ -419,7 +480,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 else -> "${route.transfers} transfers"
             }
             val distanceKm = String.format("%.1f", route.totalDistance / 1000)
-            "Option ${index + 1}: ${route.segments.map { it.jeepCode }.joinToString(" → ")} ($transferText, $distanceKm km)"
+
+            // Change the first option to "Best Route" instead of "Option 1"
+            val optionLabel = if (index == 0) "Best Route" else "Option ${index + 1}"
+            "$optionLabel: ${route.segments.map { it.jeepCode }.joinToString(" → ")} ($transferText, $distanceKm km)"
         }.toTypedArray()
 
         dialog.setItems(routeDescriptions) { _, which ->
@@ -429,6 +493,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         dialog.show()
     }
 
+    // Update displaySelectedRoute to track all route markers
     private fun displaySelectedRoute(route: CompleteRoute, destination: LatLng) {
         clearRoute()
 
@@ -469,14 +534,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             val endIndex = routeCoordinates.indexOfFirst { it.first == segment.endPoint.first }
 
             if (startIndex != -1 && endIndex != -1) {
+                // Extract only the portion of the route between start and end points
                 val routeSegment = if (startIndex <= endIndex) {
                     routeCoordinates.subList(startIndex, endIndex + 1)
                 } else {
                     routeCoordinates.subList(endIndex, startIndex + 1).reversed()
                 }
 
-                // Instead of drawing direct lines, get road-following directions
-                // between consecutive points
+                // Now only get directions for this specific segment
                 if (routeSegment.size >= 2) {
                     for (i in 0 until routeSegment.size - 1) {
                         getRoadDirections(
@@ -494,7 +559,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     .snippet(segment.startPoint.first)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
 
-                googleMap.addMarker(startMarkerOptions)
+                val marker = googleMap.addMarker(startMarkerOptions)
+                if (marker != null) {
+                    routeMarkers.add(marker)  // Track this marker
+                }
 
                 // Only add end marker if it's the last segment or a transfer point
                 if (index == route.segments.size - 1) {
@@ -504,7 +572,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         .snippet(segment.endPoint.first)
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
 
-                    googleMap.addMarker(endMarkerOptions)
+                    val endMarker = googleMap.addMarker(endMarkerOptions)
+                    if (endMarker != null) {
+                        routeMarkers.add(endMarker)  // Track this marker
+                    }
                 } else {
                     // This is a transfer point
                     val transferMarkerOptions = MarkerOptions()
@@ -513,7 +584,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         .snippet(segment.endPoint.first)
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
 
-                    googleMap.addMarker(transferMarkerOptions)
+                    val transferMarker = googleMap.addMarker(transferMarkerOptions)
+                    if (transferMarker != null) {
+                        routeMarkers.add(transferMarker)  // Track this marker
+                    }
                 }
 
                 // Add landmark markers for this route segment
@@ -566,12 +640,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 val decodedPath = PolyUtil.decode(polyline)
 
                 // Draw this segment with the specified color
-                googleMap.addPolyline(
+                val newPolyline = googleMap.addPolyline(
                     PolylineOptions()
                         .addAll(decodedPath)
                         .color(color)
                         .width(10f)
                 )
+
+                // Add to the list of route polylines
+                routePolylines.add(newPolyline)
             }
         }, { error ->
             Log.e("MapFragment", "Error fetching road path: ", error)
@@ -579,6 +656,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         queue.add(request)
     }
+
 
     // Show bottom sheet with detailed information about the multi-segment route
     private fun showMultiSegmentBottomSheet(route: CompleteRoute) {
@@ -714,10 +792,22 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun clearRoute() {
         currentPolyline?.remove()
+
+        // Clear all route polylines
+        routePolylines.forEach { it.remove() }
+        routePolylines.clear()
+
+        // Clear start and end markers
         startMarker?.remove()
         endMarker?.remove()
+
+        // Clear all landmark markers
         landmarkMarkers.forEach { it.remove() }
         landmarkMarkers.clear()
+
+        // Clear all route-related markers
+        routeMarkers.forEach { it.remove() }
+        routeMarkers.clear()
 
         currentRoute = null
         if (::showRouteDetailsButton.isInitialized) {
@@ -728,7 +818,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             bottomSheetDialog.dismiss()
         }
     }
-
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
     }
